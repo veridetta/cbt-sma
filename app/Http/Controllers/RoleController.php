@@ -41,11 +41,36 @@ class RoleController extends Controller
         $adahistory=$history->count();
         $ada_user_history=$user_h->count();
         $user_history=$user_h->get();
-
+        
         return view('siswa.siswa', ['bintang' => $bin,'pembelian'=>$pem,'jumlah_paket'=>$adapaket,'paket'=>$get_paket,'jumlah_user'=>$ada_user_paket,'user_paket'=>$user_paket,'jumlah_history'=>$adahistory,'history'=>$get_history,'jumlah_user_history'=>$ada_user_history,'user_history'=>$user_history]);
       }
       public function admin() {
-        return view('admin.admin');
+        $week = date('W');
+        $df=DB::select("select * from users where WEEK(created_at, 3)='$week'");
+        $dfbaru=count($df);
+        $paket=DB::table('paket_soal')->orderBy('id','desc');
+        $total_paket=$paket->count();
+        $paket_aktif=$paket->first();
+        $terdaftar=DB::table('peserta_paket')->where('paket_soal_id',$paket_aktif->id);
+        $total_terdaftar=$terdaftar->count();
+        $pemasukan=DB::table('riwayat_bintang as r')->join('users as u','u.id','r.id_users')->join('harga_paket as h','h.jumlah','r.nominal')->select('r.id','r.status','r.nominal','r.saldo','r.tgl','u.name','u.id','h.nominal as uang','h.jumlah');
+        $pemasukan_ini=$pemasukan->get();
+        $total_pemasukan_ini=0;
+        foreach($pemasukan_ini as $pemasukan_hari){
+          $total_pemasukan_ini+=$pemasukan_hari->uang;
+        }
+        $pend=DB::table('paket_soal as p')->join('peserta_paket as u','u.paket_soal_id','p.id')->select('p.nama',DB::raw('count(*) as total'),'p.id')->groupBy('p.id');
+        $pendaftar=$pend->get();
+        $arr_pend=array();
+        $arr_to=array();
+        foreach($pendaftar as $pendaftar_to){
+          $x=$pendaftar_to->total;
+          $y=$pendaftar_to->nama;
+          array_push($arr_pend,$x);
+          array_push($arr_to,$y);
+        }
+        return view('admin.admin',['dfbaru'=>$dfbaru,'total_terdaftar'=>$total_terdaftar,'total_paket'=>$total_paket,'pemasukan_ini'=>$total_pemasukan_ini,'arr_to'=>$arr_to,'arr_pendaftar_to'=>$arr_pend]);
+        
       }
       public function index()
       {

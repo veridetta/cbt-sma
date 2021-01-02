@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use DateTime;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+
 class ProfileController extends Controller
 {
     //
