@@ -238,14 +238,53 @@ return [
         [
             'text'        => 'Dashboard',
             'url'         => 'admin',
-            'icon'        => 'fas fa-tachometer-alt',
+            'icon'        => 'fas fa-fw fa-tachometer-alt',
             'label'       => 'harian',
             'label_color' => 'success',
         ],
         [
             'text'        => 'Peserta',
             'url'         => '/dashboard/peserta',
-            'icon'        => 'fas fa-users',
+            'icon'        => 'fas fa-fw fa-users',
+        ],
+        [
+            'text'    => 'Try Out',
+            'icon'    => 'fas fa-fw fa-book',
+            'submenu' => [
+                [
+                    'text' => 'Dashboard',
+                    'url'  => '/dashboard/dashboard_soal',
+                ],
+                [
+                    'text'    => 'Paket Soal',
+                    'url'     => '#',
+                ],
+                [
+                    'text' => 'Sesi Soal',
+                    'url'  => '#',
+                ],
+                [
+                    'text'    => 'Soal',
+                    'url'     => '#',
+                ],
+            ],
+        ],
+        'Penilaian',
+        [
+            'text' => 'Nilai Siswa',
+            'url'  => 'admin/settings',
+            'icon' => 'fas fa-fw fa-check',
+        ],
+        [
+            'text' => 'Analisis',
+            'url'  => 'admin/settings',
+            'icon' => 'fas fa-fw fa-chart-line',
+        ],
+        'Laporan',
+        [
+            'text' => 'Penerimaan',
+            'url'  => 'admin/settings',
+            'icon' => 'fas fa-fw fa-file-invoice',
         ],
         ['header' => 'account_settings'],
         [

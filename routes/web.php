@@ -29,7 +29,9 @@ Route::get('logout', [RoleController::class,'logout']);
 
 //ADMIN
 Route::get('/dashboard/peserta', [AdminController::class,'peserta'])->middleware('role:admin');
-Route::post('/peserta/datatables',  [AdminController::class,'usersByGroupDatatables'])->middleware('role:admin');
+Route::get('/peserta/datatables',  [AdminController::class,'usersByGroupDatatables'])->middleware('role:admin');
+Route::get('/dashboard/dashboard_soal',  [AdminController::class,'dashboard_soal'])->middleware('role:admin');
+
 //SISWA
 Route::get('/siswa/payment/topup',[PaymentController::class,'topup'])->middleware('role:user');;
 Route::get('/siswa/payment/generate',[PaymentController::class,'generate'])->middleware('role:user');;
