@@ -28,7 +28,7 @@ class RedirectIfAuthenticated
                 case 'admin':
                     return redirect('/admin');
                     break;
-                case 'seller':
+                case 'user':
                     return redirect('/siswa');
                     break; 
 
