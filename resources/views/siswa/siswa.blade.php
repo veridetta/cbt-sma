@@ -3,6 +3,11 @@
 
 @section('intro-header')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<style>
+.bg-dark p{
+    color:white !important;
+}
+</style>
 @endsection
 @section('main')
 <?php
@@ -44,8 +49,8 @@ function format_hari_tanggal($waktu){
     return "$hari, $tanggal $bulan $tahun";
 }
  function statistik($tipe,$id){
-    $go=1;
-    $sesi=DB::table('sesi_soal')->where('induk_sesi',$tipe)->distinct('nama_sesi');
+    $go=0;
+    $sesi=DB::table('sesi_soal')->where('induk_sesi',$tipe)->groupBy('nama_sesi');
     $dat= array(
         "deta"=>array()
     );
@@ -59,8 +64,8 @@ function format_hari_tanggal($waktu){
                 "y"=>""
             );
             $n=1;
-            if($nila->count()>0){
-              $go=0;
+            if($nila->count()<0){
+              //$go=0;
             }else{
               foreach($nila->get() as $nilai){
                 $arx['x']="TO".$n;
@@ -68,7 +73,7 @@ function format_hari_tanggal($waktu){
                 array_push($ar["data"], $arx);
                 $n++;
               }
-              $go+1;
+              $go=1;
             }
             array_push($dat["deta"], $ar);
       }
@@ -82,8 +87,10 @@ function format_hari_tanggal($waktu){
       echo "[]";
     }
 }
+$cla=array("success","danger","warning","primary","info","dark");
 ?>
 <div class="col-12 row row-imbang primary" style="padding-top:10px;padding-bottom:12px;background:#f0f0f0">
+    <div id="message" style="z-index:999;position:fixed;right:12px;bottom:12px;"></div>    
     <div class="col-12 col-lg-4 col-sm-12 col-xl-4 col-xs-12">
         <div class="card">
             <div class="card-body">
@@ -155,44 +162,83 @@ function format_hari_tanggal($waktu){
                     @else
                         @if($jumlah_user < 1)
                             @foreach($paket as $paket_list)
+                            <?php $rand=array_rand($cla,4);?>
                             <div class="col-md-3 col-11">
                                 <div class="card" style="margin-bottom:12px;">
-                                    <div class="card-header">
-                                        <p class="card-title h4 text-center">{{$paket_list->nama}}</p>
+                                    <div style="background:rgba(20,27,150,0.7);position:absolute;height:200px;width:100%"></div>
+                                    <div class="card-header bg-<?php echo $cla[$rand[1]];?>" style="background-image:url('/images/pattern.png');height:200px;">
+                                        <div class="row col-12 justify-content-center" style="min-height:200px">
+                                            <div style="position:absolute" class="text-center col-12">
+                                                <span class="badge badge-<?php echo $cla[$rand[0]];?>" style="padding:5px;">{{$paket_list->nama_kategori}}</span> <span class="badge badge-<?php echo $cla[$rand[2]];?>" style="padding:5px;">{{format_hari_tanggal(date("Y-m-d",strtotime($paket_list->tgl_mulai)))}}</span>
+                                            </div>
+                                            <p class="card-title h4 text-center my-auto font-weight-bolder text-white">{{$paket_list->nama}}</p>
+                                            <div style="position:absolute; bottom:2px;">
+                                                <span class="badge badge-<?php echo $cla[$rand[3]];?>" style="padding:5px;">Berakhir {{format_hari_tanggal(date("Y-m-d",strtotime($paket_list->tgl_selesai)))}}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <p class="display-1 text-center"><i class="fa fa-file-o"></i></p>
-                                        <p class="text-center font-weight-bold" style="margin-bottom:0px;">{{$paket_list->kategori}}</p>
-                                        <p class="text-center" style="margin-bottom:0px;">{{$paket_list->keterangan}}</p>
-                                        <p class="text-center text-muted" style="margin-bottom:0px;">{{format_hari_tanggal(date("Y-m-d",strtotime($paket_list->tgl_mulai)))}} - {{format_hari_tanggal(date("Y-m-d",strtotime($paket_list->tgl_selesai)))}}</p>
+                                    <div class="col-12" style="position:absolute">
+                                    </div>
+                                    <div class="card-body text-center" >
+                                        <div class="row col-12 text-center" style="min-height:70px;">
+                                            <p class="text-center col-12 my-auto text-<?php echo $cla[$rand[1]];?>" style="margin-left:8px;margin-bottom:0px;">"{{$paket_list->keterangan}}"</p>
+                                        </div>
                                     </div>
                                     <div class="card-footer">
-                                        <button class="kluk btn button btn-primary btn-block" id="btn-buy{{$paket_list->id}}" paket="{{$paket_list->id}}">Daftar ({{$paket_list->bintang}} <i class="text-warning fa fa-star"></i>)</button>
+                                    @if($paket_list->status==0)
+                                        <button class="btn btn-block" id="" disabled paket="{{$paket_list->id}}"><i class="text-warning fa fa-calendar"></i>    Terjadwal</button>
+                                    @else
+                                        <button class="kluk btn button btn-<?php echo $cla[$rand[1]];?> btn-block" id="btn-buy{{$paket_list->id}}" paket="{{$paket_list->id}}">Daftar ({{$paket_list->bintang}} <i class="text-warning fa fa-star"></i>)</button>                                    
+                                    @endif
                                     </div>
                                 </div>
                             </div>
                             @endforeach
                         @else
                             @foreach($paket as $paket_list)
+                            <?php $rand=array_rand($cla,4);
+                            $use=DB::table('peserta_paket')->where('paket_soal_id',$paket_list->id);
+                            $userr=$use->first();
+                            ?>
                             <div class="col-md-3 col-11">
                                 <div class="card" style="margin-bottom:12px;">
-                                    <div class="card-header">
-                                        <p class="card-title h4 text-center">{{$paket_list->nama}}</p>
+                                    <div style="background:rgba(20,27,150,0.7);position:absolute;height:200px;width:100%"></div>
+                                    <div class="card-header bg-<?php echo $cla[$rand[1]];?>" style="background-image:url('/images/pattern.png');height:200px;">
+                                        <div class="row col-12 justify-content-center" style="min-height:200px">
+                                            <div style="position:absolute" class="text-center col-12">
+                                                <span class="badge badge-<?php echo $cla[$rand[0]];?>" style="padding:5px;">{{$paket_list->nama_kategori}}</span> <span class="badge badge-<?php echo $cla[$rand[2]];?>" style="padding:5px;">{{format_hari_tanggal(date("Y-m-d",strtotime($paket_list->tgl_mulai)))}}</span>
+                                            </div>
+                                            <p class="card-title h4 text-center my-auto font-weight-bolder text-white">{{$paket_list->nama}}</p>
+                                            <div style="position:absolute; bottom:2px;">
+                                                <span class="badge badge-<?php echo $cla[$rand[3]];?>" style="padding:5px;">Berakhir {{format_hari_tanggal(date("Y-m-d",strtotime($paket_list->tgl_selesai)))}}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <p class="display-1 text-center"><i class="fa fa-file-o"></i></p>
-                                        <p class="text-center font-weight-bold" style="margin-bottom:0px;">{{$paket_list->kategori}}</p>
-                                        <p class="text-center" style="margin-bottom:0px;">{{$paket_list->keterangan}}</p>
-                                        <p class="text-center text-muted" style="margin-bottom:0px;">{{format_hari_tanggal(date("Y-m-d",strtotime($paket_list->tgl_mulai)))}} - {{format_hari_tanggal(date("Y-m-d",strtotime($paket_list->tgl_selesai)))}}</p>
+                                    <div class="col-12" style="position:absolute">
+                                    </div>
+                                    <div class="card-body text-center" >
+                                        <div class="row col-12 text-center" style="min-height:70px;">
+                                            <p class="text-center col-12 my-auto text-<?php echo $cla[$rand[1]];?>" style="margin-left:8px;margin-bottom:0px;">"{{$paket_list->keterangan}}"</p>
+                                        </div>
                                     </div>
                                     <div class="card-footer">
-                                    @if($paket_list->status==2 && $paket_list->status==1)
-                                    <form method="post" action="start/launch.php">
-                                        @csrf
-                                        <button class="btn button btn-success btn-block">Mulai Mengerjakan</button>
-                                    </form>
+                                    @if($use->count()>0)
+                                        @if($paket_list->status==2 && $userr->status==1)
+                                        <?php $udl = "/siswa/soal/launch/".$paket_list->id;?>
+                                        <form method="post" action="{{url($udl)}}">
+                                            @csrf
+                                            <input type="hidden" value="{{$paket_list->id}}" name="id_paket">
+                                            <button class="btn button btn-<?php echo $cla[$rand[1]];?> btn-block">Mulai Mengerjakan</button>
+                                        </form>
+                                        @else
+                                        <button class="btn button btn-disabled btn-block">Sudah Terdaftar</button>
+                                        @endif
                                     @else
-                                    <button class="btn button btn-disabled btn-block">Sudah Terdaftar</button>
+                                        @if($paket_list->status==0)
+                                            <button class="btn btn-block" id="" disabled paket="{{$paket_list->id}}"><i class="text-warning fa fa-calendar"></i>Terjadwal</button>
+                                        @else
+                                            <button class="kluk btn button btn-<?php echo $cla[$rand[1]];?> btn-block" id="btn-buy{{$paket_list->id}}" paket="{{$paket_list->id}}">Daftar ({{$paket_list->bintang}} <i class="text-warning fa fa-star"></i>)</button>                                    
+                                        @endif
                                     @endif
                                     </div>
                                 </div>
@@ -214,49 +260,89 @@ function format_hari_tanggal($waktu){
                 <div class="col-12 row">
                     @if($jumlah_history < 1)
                     <div class="col-12 row" style="min-height:30px;">
-                        <p class="h4 text-muted">Belum ada event terbaru</p>
+                        <p class="h4 text-muted">Belum ada event terakhir</p>
                     </div>
                     @else
                         @foreach($history as $history_list)
+                        <?php $rand=array_rand($cla,4);?>
                            <?php
                             $id= Auth::user()->id ;
                             $user=\App\Models\Peserta_paket::where('id_user','=',$id)->where('paket_soal_id','=',$history_list->id)->get();
                            ?>
-                           @foreach($user as $pengguna)
+                            @if($user->count()>0)
+                                @foreach($user as $pengguna)
+                                    <div class="col-md-3 col-11">
+                                        <div class="card" style="margin-bottom:12px;">
+                                            <div style="background:rgba(20,27,29,0.7);position:absolute;height:200px;width:100%"></div>
+                                            <div class="card-header bg-<?php echo $cla[$rand[1]];?>" style="background-image:url('/images/pattern.png');height:200px;">
+                                                <div class="row col-12 justify-content-center" style="min-height:200px">
+                                                    <div style="position:absolute" class="text-center col-12">
+                                                        <span class="badge badge-<?php echo $cla[$rand[0]];?>" style="padding:5px;">{{$history_list->nama_kategori}}</span> <span class="badge badge-<?php echo $cla[$rand[2]];?>" style="padding:5px;">{{format_hari_tanggal(date("Y-m-d",strtotime($history_list->tgl_mulai)))}}</span>
+                                                    </div>
+                                                    <p class="card-title h4 text-center my-auto font-weight-bolder text-white">{{$history_list->nama}}</p>
+                                                    <div style="position:absolute; bottom:2px;">
+                                                        <span class="badge badge-<?php echo $cla[$rand[3]];?>" style="padding:5px;">Berakhir {{format_hari_tanggal(date("Y-m-d",strtotime($history_list->tgl_selesai)))}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12" style="position:absolute">
+                                            </div>
+                                            <div class="card-body text-center" >
+                                                <div class="row col-12 text-center" style="min-height:70px;">
+                                                    <p class="text-center col-12 my-auto text-<?php echo $cla[$rand[1]];?>" style="margin-left:8px;margin-bottom:0px;">"{{$history_list->keterangan}}"</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer">
+                                            @if($history_list->status==4 && $pengguna->status > 0)
+                                            <form method="post" action="{{url('siswa/analisis')}}">
+                                                @csrf
+                                                <input type="hidden" name="id" value="{{Auth::user()->id}}">
+                                                <input type="hidden" name="id_paket" value="{{$history_list->id}}">
+                                                <button class="btn button btn-primary btn-block">Buat Analisis Saya</button>
+                                            </form>
+                                            <form method="post" action="{{url('/siswa/soal/bahas-launch')}}" style="margin-top:12px;">
+                                                @csrf
+                                                <input type="hidden" name="id" value="{{Auth::user()->id}}">
+                                                <input type="hidden" name="id_paket" value="{{$history_list->id}}">
+                                                <button class="btn button btn-success btn-block">Lihat Pembahasan</button>
+                                            </form>
+                                            @elseif($history_list->status==3 && $pengguna->status>0))
+                                            <button class="btn button btn-disabled btn-block">Menunggu Pembahasan</button>
+                                            @else
+                                            <button class="btn button btn-disabled btn-block">Tidak Terdaftar</button>
+                                            @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
                             <div class="col-md-3 col-11">
-                                <div class="card" style="margin-bottom:12px;">
-                                    <div class="card-header">
-                                        <p class="card-title h4 text-center">{{$history_list->nama}}</p>
+                                        <div class="card" style="margin-bottom:12px;">
+                                            <div style="background:rgba(20,27,29,0.7);position:absolute;height:200px;width:100%"></div>
+                                            <div class="card-header bg-<?php echo $cla[$rand[1]];?>" style="background-image:url('/images/pattern.png');height:200px;">
+                                                <div class="row col-12 justify-content-center" style="min-height:200px">
+                                                    <div style="position:absolute" class="text-center col-12">
+                                                        <span class="badge badge-<?php echo $cla[$rand[0]];?>" style="padding:5px;">{{$history_list->nama_kategori}}</span> <span class="badge badge-<?php echo $cla[$rand[2]];?>" style="padding:5px;">{{format_hari_tanggal(date("Y-m-d",strtotime($history_list->tgl_mulai)))}}</span>
+                                                    </div>
+                                                    <p class="card-title h4 text-center my-auto font-weight-bolder text-white">{{$history_list->nama}}</p>
+                                                    <div style="position:absolute; bottom:2px;">
+                                                        <span class="badge badge-<?php echo $cla[$rand[3]];?>" style="padding:5px;">Berakhir {{format_hari_tanggal(date("Y-m-d",strtotime($history_list->tgl_selesai)))}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12" style="position:absolute">
+                                            </div>
+                                            <div class="card-body text-center" >
+                                                <div class="row col-12 text-center" style="min-height:70px;">
+                                                    <p class="text-center col-12 my-auto text-<?php echo $cla[$rand[1]];?>" style="margin-left:8px;margin-bottom:0px;">"{{$history_list->keterangan}}"</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer">
+                                            <button class="btn button btn-disabled btn-block">Tidak Terdaftar</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <p class="display-1 text-center"><i class="fa fa-file-o"></i></p>
-                                        <p class="text-center font-weight-bold" style="margin-bottom:0px;">{{$history_list->kategori}}</p>
-                                        <p class="text-center" style="margin-bottom:0px;">{{$history_list->keterangan}}</p>
-                                        <p class="text-center text-muted" style="margin-bottom:0px;">{{format_hari_tanggal(date("Y-m-d",strtotime($history_list->tgl_mulai)))}} - {{format_hari_tanggal(date("Y-m-d",strtotime($history_list->tgl_selesai)))}}</p>
-                                    </div>
-                                    <div class="card-footer">
-                                    @if($history_list->status==4 && $pengguna->status > 0)
-                                    <form method="post" action="{{url('siswa/analisis')}}">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{Auth::user()->id}}">
-                                        <input type="hidden" name="id_paket" value="{{$history_list->id}}">
-                                        <button class="btn button btn-primary btn-block">Buat Analisis Saya</button>
-                                    </form>
-                                    <form method="post" action="{{url('/siswa/soal/bahas-launch')}}" style="margin-top:12px;">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{Auth::user()->id}}">
-                                        <input type="hidden" name="id_paket" value="{{$history_list->id}}">
-                                        <button class="btn button btn-success btn-block">Lihat Pembahasan</button>
-                                    </form>
-                                    @elseif($history_list->status==3 && $pengguna->status>0))
-                                    <button class="btn button btn-disabled btn-block">Menunggu Pembahasan</button>
-                                    @else
-                                    <button class="btn button btn-disabled btn-block">Tidak Terdaftar</button>
-                                    @endif
-                                    </div>
-                                </div>
-                            </div>
-                           @endforeach
+                            @endif
                         @endforeach
                     @endif
                     <p></p>
@@ -336,6 +422,9 @@ function format_hari_tanggal($waktu){
             'X-CSRF-TOKEN': $('meta[name=csrf-token]').attr('content')
         }
     });
+    function mAlert(judul,pesan,clas){
+        $("#message").append('<div id="" class="alert alert-'+clas+' alert-dismissible fade show"><button type="button" class="close" data-dismiss="alert"> &times;</button><span id="message"><i class="fas fa-fw fa-bell"></i> '+pesan+'. &nbsp;&nbsp;</span></div>');
+    };
     
     $(".kluk").click(function(){
         var vale = $(this).attr("paket");
@@ -354,13 +443,13 @@ function format_hari_tanggal($waktu){
             dataType : 'json',
         }).done(function(data){
             if(data.success){
-                
+                mAlert(data.judul,data.pesan,'success');
+            setTimeout(function() {
+                window.location.replace("{{url('/siswa')}}");
+            }, 1500);
             }else{
-
+                mAlert(data.judul,data.pesan,'danger');
             }
-            $('#myModal').modal('show'); 
-            $("#judul").html(data.judul);
-            $("#pesan").html(data.pesan);
         })
     });
     
@@ -369,6 +458,7 @@ var options = {
         chart: {
             type: 'area',
             stacked: true,
+            height: '320',
             foreColor: "#2ecc71"
         },
         events: {
@@ -413,6 +503,7 @@ var options = {
         chart: {
             type: 'area',
             stacked: true,
+            height: '320',
             foreColor: "#f39c12"
         },
         events: {

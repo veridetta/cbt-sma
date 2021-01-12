@@ -19,7 +19,7 @@ class CreatePaketSoalTable extends Migration
             $table->string('kategori');
             $table->string('keterangan');
             $table->string('status');
-            $table->string('voucher');
+            $table->string('voucher')->nullable();
             $table->string('bintang');
             $table->date('tgl_mulai');
             $table->date('tgl_selesai');

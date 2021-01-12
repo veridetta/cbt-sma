@@ -257,22 +257,18 @@ return [
                 ],
                 [
                     'text'    => 'Paket Soal',
-                    'url'     => '#',
+                    'url'     => '/dashboard/paket_soal',
                 ],
                 [
                     'text' => 'Sesi Soal',
-                    'url'  => '#',
-                ],
-                [
-                    'text'    => 'Soal',
-                    'url'     => '#',
+                    'url'  => '/dashboard/sesi_soal',
                 ],
             ],
         ],
         'Penilaian',
         [
             'text' => 'Nilai Siswa',
-            'url'  => 'admin/settings',
+            'url'  => 'dashboard/nilai_siswa',
             'icon' => 'fas fa-fw fa-check',
         ],
         [
@@ -285,6 +281,11 @@ return [
             'text' => 'Penerimaan',
             'url'  => 'admin/settings',
             'icon' => 'fas fa-fw fa-file-invoice',
+        ],
+        [
+            'text' => 'Bintang',
+            'url'  => 'admin/settings',
+            'icon' => 'fas fa-fw fa-star',
         ],
         ['header' => 'account_settings'],
         [

@@ -18,6 +18,7 @@
         max-width:100% !important;
     }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 @stop
 @section('content')
     <div class="container-fluid col-12">

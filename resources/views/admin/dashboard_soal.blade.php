@@ -31,6 +31,7 @@
                 </h3>
             </div><!-- /.card-header -->
             <div class="card-body">
+                <p class="h4 text-secondary quoted">Try Out Welcome Rangers</p>
             </div>
         </div>
     </section>

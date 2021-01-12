@@ -17,7 +17,7 @@ class RoleController extends Controller
         $bin = DB::select('select * from riwayat_bintang where id_users = ? order by id desc limit 1', [$id_users]);
         $pem=DB::select('select * from riwayat_bintang where id_users = ? order by id desc', [$id_users]);
         //$paket=DB::table('paket_soal')->where('status','<','3')->orderBy('id','DESC');
-        $paket=Paket_soal::where('status','<',3)->orderBy('id','DESC');
+        $paket=DB::table('paket_soal as ps')->join('kategori_soal as ks','ks.id','ps.kategori')->select('ps.*','ks.nama as nama_kategori')->where('ps.status','<',3)->orderBy('ps.id');
         $user_p=DB::table('peserta_paket')
                 ->join('paket_soal','paket_soal.id','=','peserta_paket.paket_soal_id')
                 ->select('paket_soal.*','peserta_paket.status as UserStatus')
@@ -30,7 +30,7 @@ class RoleController extends Controller
         $user_paket=$user_p->get();
         //history
         //$history=DB::table('paket_soal')->where('status','>','2')->orderBy('id','DESC');
-        $history=Paket_soal::where('status','>','2')->orderBy('id','DESC');
+        $history=DB::table('paket_soal as ps')->join('kategori_soal as ks','ks.id','ps.kategori')->where('ps.status','>','2')->select('ps.*','ks.nama as nama_kategori')->orderBy('ps.id','DESC');
         $user_h=DB::table('peserta_paket')
                 ->join('paket_soal','paket_soal.id','=','peserta_paket.paket_soal_id')
                 ->select('peserta_paket.status as UserStatus','paket_soal.*')

@@ -19,7 +19,7 @@ class CreateRiwayatBintangTable extends Migration
             $table->string('nominal');
             $table->string('status');
             $table->string('saldo');
-            $table->datetime('tgl');
+            $table->datetime('tgl')->default(DB::raw('CURRENT_TIMESTAMP')->nullable()->change);
         });
     }
 
